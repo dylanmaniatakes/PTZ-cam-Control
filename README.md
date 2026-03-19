@@ -2,7 +2,7 @@
 
 Small local controller for a VISCA-capable PTZ camera connected through an RS232-to-TCP bridge such as a Moxa serial device server.
 
-I specifically built this for the [https://amzn.to/4lHUsJa] (AVKANS NDI 20x Zoom Camera) But it should work with any camera supporting the VISCA protocol over serial. It would be easy to rewire this for a local serial connection, however im a fan of serial TCP servers. 
+I specifically built this for the [https://amzn.to/4lHUsJa](AVKANS NDI 20x Zoom Camera) But it should work with any camera supporting the VISCA protocol over serial. It would be easy to rewire this for a local serial connection, however im a fan of serial TCP servers. 
 
 ## What it does
 
