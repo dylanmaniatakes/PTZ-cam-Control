@@ -1,0 +1,9 @@
+{
+  "name": "ptz-cam-control",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Simple VISCA-over-TCP controller for RS232 PTZ cameras behind a serial device server.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

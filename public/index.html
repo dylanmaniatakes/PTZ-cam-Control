@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PTZ Cam Control</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="panel hero">
+        <div>
+          <p class="eyebrow">VISCA over TCP</p>
+          <h1>PTZ Cam Control</h1>
+          <p class="lede">
+            Local controller for an RS232 camera behind a serial device server such as a Moxa.
+          </p>
+        </div>
+        <div class="status-row">
+          <span id="connectionBadge" class="badge badge-offline">Disconnected</span>
+          <span id="bridgeTarget" class="bridge-target">No bridge selected</span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Bridge</h2>
+        <form id="connectForm" class="form-grid">
+          <label>
+            Host
+            <input id="host" name="host" placeholder="192.168.1.50" required>
+          </label>
+          <label>
+            Port
+            <input id="port" name="port" type="number" min="1" max="65535" value="4001" required>
+          </label>
+          <label>
+            Camera address
+            <input id="cameraAddress" name="cameraAddress" type="number" min="1" max="7" value="1">
+          </label>
+          <div class="button-row">
+            <button type="submit" class="primary">Connect</button>
+            <button type="button" id="disconnectButton">Disconnect</button>
+            <button type="button" id="clearButton">IF_Clear</button>
+          </div>
+        </form>
+        <p class="hint">
+          Match the serial server to the camera’s RS232 settings first. The app only talks TCP to the bridge.
+        </p>
+      </section>
+
+      <section class="panel control-layout">
+        <div>
+          <h2>Pan / Tilt</h2>
+          <div class="speed-grid">
+            <label>
+              Pan speed
+              <input id="panSpeed" type="range" min="1" max="24" value="6">
+              <span id="panSpeedValue">6</span>
+            </label>
+            <label>
+              Tilt speed
+              <input id="tiltSpeed" type="range" min="1" max="23" value="6">
+              <span id="tiltSpeedValue">6</span>
+            </label>
+          </div>
+          <div class="ptz-grid">
+            <button data-hold-action="upLeft">↖</button>
+            <button data-hold-action="up">↑</button>
+            <button data-hold-action="upRight">↗</button>
+            <button data-hold-action="left">←</button>
+            <button id="homeButton" class="accent" type="button">Home</button>
+            <button data-hold-action="right">→</button>
+            <button data-hold-action="downLeft">↙</button>
+            <button data-hold-action="down">↓</button>
+            <button data-hold-action="downRight">↘</button>
+          </div>
+        </div>
+
+        <div>
+          <h2>Zoom</h2>
+          <label class="zoom-speed">
+            Zoom speed
+            <input id="zoomSpeed" type="range" min="0" max="7" value="2">
+            <span id="zoomSpeedValue">2</span>
+          </label>
+          <div class="zoom-buttons">
+            <button data-hold-action="zoomWide">Wide</button>
+            <button data-click-action="zoomStop">Stop</button>
+            <button data-hold-action="zoomTele">Tele</button>
+          </div>
+
+          <h2>Presets</h2>
+          <div class="preset-row">
+            <label>
+              Preset
+              <input id="preset" type="number" min="1" max="64" value="1">
+            </label>
+            <div class="button-row">
+              <button data-preset-action="presetRecall">Recall</button>
+              <button data-preset-action="presetSet">Set</button>
+              <button data-preset-action="presetReset">Reset</button>
+            </div>
+            <div class="preset-grid">
+              <button type="button" data-quick-preset="1">1</button>
+              <button type="button" data-quick-preset="2">2</button>
+              <button type="button" data-quick-preset="3">3</button>
+              <button type="button" data-quick-preset="4">4</button>
+              <button type="button" data-quick-preset="5">5</button>
+              <button type="button" data-quick-preset="6">6</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <details class="foldout">
+          <summary>
+            <span>Stream Deck Webhooks</span>
+            <span class="foldout-hint">Simple HTTP triggers</span>
+          </summary>
+          <div class="foldout-body">
+            <p class="hint">
+              Use Stream Deck's HTTP request action or any button/plugin that can open a local URL.
+            </p>
+            <div class="webhook-list">
+              <div>
+                <strong>Home</strong>
+                <code id="webhookHomeExample"></code>
+              </div>
+              <div>
+                <strong>Preset 1</strong>
+                <code id="webhookPresetExample"></code>
+              </div>
+              <div>
+                <strong>Left nudge</strong>
+                <code id="webhookLeftExample"></code>
+              </div>
+              <div>
+                <strong>Zoom in</strong>
+                <code id="webhookZoomExample"></code>
+              </div>
+            </div>
+            <p class="hint">
+              If you start the app with <code>WEBHOOK_TOKEN=your-secret</code>, add <code>?token=your-secret</code>
+              to each URL or send it as an <code>X-PTZ-Token</code> header.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      <section class="panel">
+        <details class="foldout">
+          <summary>
+            <span>Raw Hex</span>
+            <span class="foldout-hint">Optional advanced commands</span>
+          </summary>
+          <div class="foldout-body">
+            <div class="raw-row">
+              <textarea id="rawHex" rows="3" placeholder="81 01 06 04 FF"></textarea>
+              <button id="sendRawButton" class="primary" type="button">Send Raw</button>
+            </div>
+            <p class="hint">Useful for commands outside the built-in buttons.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="panel">
+        <details class="foldout" open>
+          <summary>
+            <span>Session Log</span>
+            <span class="foldout-hint">Traffic and replies</span>
+          </summary>
+          <div class="foldout-body">
+            <div class="log-header">
+              <button id="refreshButton" type="button">Refresh</button>
+            </div>
+            <div id="lastError" class="error-box hidden"></div>
+            <div id="logList" class="log-list"></div>
+          </div>
+        </details>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
