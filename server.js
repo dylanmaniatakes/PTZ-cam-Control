@@ -4,9 +4,11 @@ const net = require("node:net");
 const path = require("node:path");
 const { URL } = require("node:url");
 
+const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number.parseInt(process.env.PORT || "3000", 10);
 const PUBLIC_DIR = path.join(__dirname, "public");
-const BRIDGE_STATE_FILE = path.join(__dirname, "bridge-state.json");
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+const BRIDGE_STATE_FILE = path.join(DATA_DIR, "bridge-state.json");
 const LOG_LIMIT = 120;
 const WEBHOOK_TOKEN = String(process.env.WEBHOOK_TOKEN || "");
 const AUTO_RECONNECT_MS = Number.parseInt(process.env.AUTO_RECONNECT_MS || "5000", 10);
@@ -42,6 +44,8 @@ const reconnectState = {
   timer: null,
   manualDisconnect: false
 };
+
+fs.mkdirSync(DATA_DIR, { recursive: true });
 
 function readSavedBridge() {
   try {
@@ -718,9 +722,9 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, "127.0.0.1", () => {
-  logEntry("status", `HTTP UI listening on http://127.0.0.1:${PORT}.`);
-  console.log(`PTZ control app running on http://127.0.0.1:${PORT}`);
+server.listen(PORT, HOST, () => {
+  logEntry("status", `HTTP UI listening on ${HOST}:${PORT}. Open http://localhost:${PORT} from the host machine.`);
+  console.log(`PTZ control app running on ${HOST}:${PORT} (host URL: http://localhost:${PORT})`);
   autoConnectSavedBridge().catch((error) => {
     logEntry("error", `Startup auto-connect failed: ${error.message}`);
   });

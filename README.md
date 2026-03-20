@@ -26,6 +26,31 @@ If you want token-protected webhooks for Stream Deck, start it like this:
 WEBHOOK_TOKEN=your-secret npm start
 ```
 
+## Docker / Compose
+
+If you want the app to run on a machine without a local Node install, use the included container setup:
+
+```bash
+cp .env.example .env
+docker compose up --build -d
+```
+
+Then open [http://localhost:3000](http://localhost:3000), unless you changed `PTZ_HTTP_PORT` in `.env`.
+
+Portable folder layout:
+
+- `compose.yml` builds and runs the app from the current folder.
+- `data/bridge-state.json` stores the last successful bridge target on the host machine.
+- Moving the folder to another machine preserves the compose setup and saved bridge state as long as the `data/` directory moves with it.
+
+Useful commands:
+
+```bash
+docker compose up --build -d
+docker compose logs --tail 100
+docker compose down
+```
+
 ## Bridge setup
 
 Configure the serial server to match the camera:
